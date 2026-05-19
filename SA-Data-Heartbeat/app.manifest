@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "2.0.0",
+  "info": {
+    "title": "Data Heartbeat",
+    "id": {
+      "group": null,
+      "name": "SA-Data-Heartbeat",
+      "version": "1.2.3"
+    },
+    "author": [
+      {
+        "name": "DataDay Technology Solutions",
+        "email": "support@datadaytech.com",
+        "company": "DataDay Technology Solutions"
+      }
+    ],
+    "releaseDate": "2026-05-18",
+    "description": "Monitor source types for data gaps. Detects when source types stop logging and flags them based on configurable thresholds. Your data's pulse - always monitored.",
+    "classification": {
+      "intendedAudience": "IT",
+      "categories": ["IT Operations", "Splunk Administration", "Security, Fraud & Compliance"],
+      "developmentStatus": "Production/Stable"
+    },
+    "commonInformationModels": {
+      "Splunk_SA_CIM": "5.x"
+    },
+    "license": {
+      "name": "Custom Commercial",
+      "text": "LICENSE.txt",
+      "uri": null
+    },
+    "privacyPolicy": {
+      "name": null,
+      "text": null,
+      "uri": null
+    },
+    "releaseNotes": {
+      "name": "Release Notes",
+      "text": "1.2.3: Alert dispatcher hardening. Fixes self-signed-cert failure on localhost splunkd email path; validates webhook URLs (rejects non-http(s) targets like Slack channel names instead of crashing); guards SPL injection via email recipients/sourcetype; per-row failures now identify the offending sourcetype/action; throttle no longer blocks worker pool during sleep; email path now retries on transient errors; User-Agent auto-syncs with app version. UI: slack target placeholder now correctly suggests a webhook URL.",
+      "uri": null
+    }
+  },
+  "dependencies": null,
+  "tasks": null,
+  "inputGroups": null,
+  "incompatibleApps": null,
+  "platformRequirements": {
+    "splunk": {
+      "Enterprise": "*"
+    }
+  },
+  "targetWorkloads": ["_search_heads"]
+}

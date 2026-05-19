@@ -1,0 +1,339 @@
+<dashboard version="1.1" theme="dark" script="js/utils-v4.js,js/heartbeat-v15.js" stylesheet="css/heartbeat-v2.css">
+  <label>Data Heartbeat Monitor</label>
+  <description>Monitor your sourcetypes for data gaps</description>
+
+  <row>
+    <panel>
+      <html>
+        <div class="heartbeat-app">
+          <!-- Header -->
+          <div class="heartbeat-header">
+            <h1 class="heartbeat-title">
+              <span class="pulse-icon" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FD1875" stroke-width="2.5" role="img" aria-label="Heartbeat">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+              </span>
+              Data Heartbeat
+            </h1>
+            <p class="heartbeat-subtitle">Real-time monitoring of sourcetype data ingestion - Auto-discovers important sourcetypes from your searches, dashboards, and usage patterns</p>
+          </div>
+
+          <!-- Onboarding banner (hidden by JS once data exists) -->
+          <div class="hb-onboarding" id="hb-onboarding" role="region" aria-label="Get started with Data Heartbeat">
+            <div class="hb-onboarding-icon" aria-hidden="true">
+              <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4a9eff" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <div class="hb-onboarding-body">
+              <div class="hb-onboarding-title">Welcome to Data Heartbeat</div>
+              <div class="hb-onboarding-text">
+                You're not monitoring any sourcetypes yet. Pick one:
+                <ul class="hb-onboarding-steps">
+                  <li><strong>Curated picks</strong> &#8211; add a balanced set of 10 commonly-monitored sourcetypes (Windows, EDR, Okta, Azure AD, AWS, firewall, Linux). Best for a fast SOC-style baseline.</li>
+                  <li><strong>Recommend from my data</strong> &#8211; scan your environment with <code>tstats</code>, find which sourcetypes you actually ingest, and add the top 10. Best when you want only entries you'll see real data for.</li>
+                </ul>
+              </div>
+              <div class="hb-onboarding-actions">
+                <button class="hb-btn hb-btn-primary" id="btn-quickstart-curated" title="Add 10 hand-picked sourcetypes covering Windows, EDR, identity, cloud, and firewall">
+                  Curated picks
+                </button>
+                <button class="hb-btn hb-btn-discovery" id="btn-quickstart-recommend" title="Scan your environment with tstats and add the most-relevant sourcetypes you actually ingest">
+                  Recommend from my data
+                </button>
+              </div>
+            </div>
+            <button class="hb-onboarding-dismiss" id="hb-onboarding-dismiss" aria-label="Dismiss onboarding banner">&#x2715;</button>
+          </div>
+
+          <!-- Stats Row -->
+          <div class="stats-row">
+            <div class="stat-card vip" id="stat-vip-card">
+              <div class="stat-label">VIP Sources</div>
+              <div class="stat-value" id="stat-vip">0</div>
+            </div>
+            <div class="stat-card info">
+              <div class="stat-label">Total Monitored</div>
+              <div class="stat-value" id="stat-total">0</div>
+            </div>
+            <div class="stat-card success">
+              <div class="stat-label">Healthy</div>
+              <div class="stat-value" id="stat-good">0</div>
+            </div>
+            <div class="stat-card pending">
+              <div class="stat-label">Pending</div>
+              <div class="stat-value" id="stat-pending">0</div>
+            </div>
+            <div class="stat-card danger">
+              <div class="stat-label">Flagged</div>
+              <div class="stat-value" id="stat-flagged">0</div>
+            </div>
+          </div>
+
+          <!-- Status banner: warns when scheduled searches are disabled.
+               Populated and shown/hidden by heartbeat-v6.js after it reads
+               the 3 saved-search states on page load. -->
+          <div class="hb-status-banner hb-hidden" id="hb-status-banner" role="status">
+            <div class="hb-status-banner-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </div>
+            <div class="hb-status-banner-body">
+              <strong>Monitoring not running</strong>
+              <span id="hb-status-banner-text"></span>
+            </div>
+            <button class="hb-btn hb-btn-primary hb-btn-sm" id="btn-enable-monitoring" title="Enable all 3 scheduled searches in one click (uses the in-app admin endpoint, bypasses the splunkweb proxy bug)">Enable Monitoring</button>
+            <a class="hb-btn hb-btn-secondary hb-btn-sm" href="/app/SA-Data-Heartbeat/settings" id="hb-status-banner-goto">Open Settings</a>
+          </div>
+
+          <!-- Main Content -->
+          <div class="heartbeat-content">
+            <div class="content-panel">
+              <div class="panel-header">
+                <h2 class="panel-title">Monitored Sourcetypes</h2>
+                <div class="panel-actions">
+                  <button class="hb-btn hb-btn-discovery" id="btn-run-discovery" title="Find sourcetypes active in your environment (keyboard: d)">
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      <line x1="11" y1="8" x2="11" y2="14"></line>
+                      <line x1="8" y1="11" x2="14" y2="11"></line>
+                    </svg>
+                    Run Discovery
+                  </button>
+                  <button class="hb-btn hb-btn-secondary" id="btn-run-detection" title="Run the detection saved search now to update statuses">
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Run Detection
+                  </button>
+                  <button class="hb-btn hb-btn-icon hb-btn-help" id="btn-how-this-works" title="How does this dashboard work?" aria-label="How does this dashboard work?">
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                  </button>
+                  <button class="hb-btn hb-btn-primary" id="btn-add-sourcetype" title="Add a single sourcetype with custom threshold (keyboard: a)">
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add Sourcetype
+                  </button>
+                </div>
+              </div>
+
+              <!-- Filter Bar -->
+              <div class="filter-bar">
+                <div class="filter-group">
+                  <span class="filter-label">Status:</span>
+                  <div class="filter-chips">
+                    <span class="filter-chip active" data-filter-type="status" data-filter-value="all">All</span>
+                    <span class="filter-chip" data-filter-type="status" data-filter-value="flagged">Flagged</span>
+                    <span class="filter-chip" data-filter-type="status" data-filter-value="good">Healthy</span>
+                    <span class="filter-chip" data-filter-type="status" data-filter-value="pending">Pending</span>
+                  </div>
+                </div>
+                <div class="filter-group">
+                  <span class="filter-label">Importance:</span>
+                  <div class="filter-chips">
+                    <span class="filter-chip active" data-filter-type="importance" data-filter-value="all">All</span>
+                    <span class="filter-chip vip-chip" data-filter-type="importance" data-filter-value="vip">VIP</span>
+                    <span class="filter-chip" data-filter-type="importance" data-filter-value="critical">Critical</span>
+                    <span class="filter-chip" data-filter-type="importance" data-filter-value="high">High</span>
+                    <span class="filter-chip" data-filter-type="importance" data-filter-value="medium">Medium</span>
+                    <span class="filter-chip" data-filter-type="importance" data-filter-value="low">Low</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel-body">
+                <div id="sourcetype-monitor-table">
+                  <div class="hb-loading">
+                    <div class="hb-spinner"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- How This Works Modal -->
+          <div class="hb-modal-backdrop" id="how-this-works-modal" style="display:none">
+            <div class="hb-modal">
+              <div class="hb-modal-header">
+                <h3 class="hb-modal-title">How this dashboard works</h3>
+                <button class="hb-modal-close">&#x2715;</button>
+              </div>
+              <div class="hb-modal-body">
+                <p class="hb-help-intro">Data Heartbeat watches your monitored sourcetypes and flags any that stop sending data. Three actions drive everything:</p>
+                <dl class="hb-help-list">
+                  <dt><span class="hb-help-pill hb-help-pill-detection">Run Detection</span></dt>
+                  <dd>Refreshes the "Last Seen" timestamp and status (Good / Flagged) for every sourcetype you're monitoring. Runs automatically every 5 minutes when the Detection schedule is enabled. Click it to refresh on demand.</dd>
+                  <dt><span class="hb-help-pill hb-help-pill-discovery">Run Discovery</span></dt>
+                  <dd>Scans your Splunk environment (saved searches, dashboards, audit logs) and <em>suggests new sourcetypes worth monitoring</em>. It does NOT change what you're already monitoring — it just surfaces candidates.</dd>
+                  <dt><span class="hb-help-pill hb-help-pill-pending">Pending</span></dt>
+                  <dd>A sourcetype shows Pending when it's been added but Detection hasn't run against it yet. Pending flips to Good (data arriving) or Flagged (silent past threshold) on the next Detection cycle, or as soon as you click Run Detection.</dd>
+                </dl>
+                <p class="hb-help-footnote">Scheduled searches need to be enabled in Settings for this to work without manual clicks. A banner at the top of this page will tell you if any are off.</p>
+                <p class="hb-help-footnote"><strong>Permissions matter:</strong> Detection uses <code>| metadata</code>, which only returns sourcetypes the running user can read. The detection user needs read on <code>index=*</code> AND <code>index=_*</code> (internal indexes) or some rows will show Pending forever.</p>
+              </div>
+              <div class="hb-modal-footer">
+                <button class="hb-btn hb-btn-primary btn-modal-cancel">Got it</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Sourcetype Modal -->
+          <div class="hb-modal-backdrop" id="add-sourcetype-modal" style="display:none">
+            <div class="hb-modal">
+              <div class="hb-modal-header">
+                <h3 class="hb-modal-title">Add Sourcetype</h3>
+                <button class="hb-modal-close">&#x2715;</button>
+              </div>
+              <div class="hb-modal-body">
+                <div class="hb-tabs" role="tablist">
+                  <button type="button" class="hb-tab active" data-tab="pick" role="tab" aria-selected="true">From environment</button>
+                  <button type="button" class="hb-tab" data-tab="paste" role="tab" aria-selected="false">Type or paste list</button>
+                </div>
+                <div class="hb-tab-panel" data-panel="pick">
+                  <div class="hb-form-group">
+                    <label class="hb-form-label">Sourcetype</label>
+                    <select class="hb-form-select" id="add-sourcetype-select">
+                      <option value="">Loading...</option>
+                    </select>
+                    <p class="hb-form-help">Select from available sourcetypes in your environment</p>
+                  </div>
+                </div>
+                <div class="hb-tab-panel" data-panel="paste" style="display:none">
+                  <div class="hb-form-group">
+                    <label class="hb-form-label">Sourcetypes (one per line, or comma-separated)</label>
+                    <textarea class="hb-form-input" id="add-sourcetype-bulk" rows="6" placeholder="aws:cloudtrail&#10;paloalto:traffic&#10;custom_app_log"></textarea>
+                    <p class="hb-form-help"><span id="bulk-count">0</span> sourcetypes entered. Useful for sourcetypes not yet sending data, or to add many at once.</p>
+                  </div>
+                </div>
+                <div class="hb-form-group">
+                  <label class="hb-form-label">Importance</label>
+                  <select class="hb-form-select" id="add-importance-select">
+                    <option value="vip">VIP - Ultra Critical, drop everything if down</option>
+                    <option value="critical">Critical - Business essential, immediate alerts</option>
+                    <option value="high" selected="selected">High - Important, should be monitored closely</option>
+                    <option value="medium">Medium - Standard monitoring</option>
+                    <option value="low">Low - Nice to have, less urgent</option>
+                  </select>
+                  <p class="hb-form-help">How important is this sourcetype to your operations?</p>
+                </div>
+                <div class="hb-form-group">
+                  <label class="hb-form-label">Threshold (minutes)</label>
+                  <input type="number" class="hb-form-input" id="add-threshold-input" value="60" min="1" max="9999" />
+                  <p class="hb-form-help">Alert if no data received within this time period</p>
+                </div>
+                <div class="hb-form-group">
+                  <label class="hb-form-label">Notes (optional)</label>
+                  <input type="text" class="hb-form-input" id="add-notes-input" placeholder="Optional notes about this sourcetype" />
+                </div>
+              </div>
+              <div class="hb-modal-footer">
+                <button class="hb-btn hb-btn-secondary btn-modal-cancel">Cancel</button>
+                <button class="hb-btn hb-btn-primary" id="btn-confirm-add">Add Sourcetype</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIP Confirmation Modal -->
+          <div class="hb-modal-backdrop" id="vip-confirm-modal" style="display:none">
+            <div class="hb-modal vip-modal">
+              <div class="hb-modal-header vip-header">
+                <h3 class="hb-modal-title">
+                  <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF0000" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                  Confirm VIP Status
+                </h3>
+                <button class="hb-modal-close btn-cancel-vip" aria-label="Close VIP confirmation">&#x2715;</button>
+              </div>
+              <div class="hb-modal-body">
+                <div class="vip-warning">
+                  <p class="vip-warning-title">You are about to mark <strong id="vip-confirm-sourcetype"></strong> as VIP.</p>
+                  <p class="vip-warning-text">VIP status is reserved for <strong>ultra-critical</strong> data sources that require immediate attention if they stop flowing.</p>
+                  <div class="vip-warning-box">
+                    <p><strong>Be very selective when using VIP status:</strong></p>
+                    <ul>
+                      <li>If everything is VIP, nothing is VIP</li>
+                      <li>Reserve this for truly mission-critical feeds</li>
+                      <li>VIP items always appear at the top</li>
+                      <li>Consider using Critical for important but non-emergency sources</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="hb-modal-footer">
+                <button class="hb-btn hb-btn-secondary" id="btn-cancel-vip">Cancel</button>
+                <button class="hb-btn hb-btn-vip" id="btn-confirm-vip">
+                  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                  Yes, Mark as VIP
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Configuration Modal -->
+          <div class="hb-modal-backdrop" id="action-config-modal" style="display:none">
+            <div class="hb-modal action-modal">
+              <div class="hb-modal-header">
+                <h3 class="hb-modal-title">
+                  <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FD1875" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                  Configure Alert Action
+                </h3>
+                <button class="hb-modal-close btn-cancel-action" aria-label="Close action config">&#x2715;</button>
+              </div>
+              <div class="hb-modal-body">
+                <p class="action-modal-subtitle">Configure alert action for <strong id="action-modal-sourcetype"></strong></p>
+
+                <div class="action-types-container">
+                  <label class="hb-form-label">Select Action Type</label>
+                  <div id="action-types-list" class="action-types-list">
+                    <!-- Action types populated by JavaScript -->
+                  </div>
+                </div>
+
+                <div id="action-config-section" class="action-config-section">
+                  <div class="hb-form-group">
+                    <label class="hb-form-label" id="action-config-label">Configuration</label>
+                    <input type="text" class="hb-form-input" id="action-config-input" placeholder="" />
+                    <p class="hb-form-help" id="action-config-hint"></p>
+                  </div>
+                </div>
+              </div>
+              <div class="hb-modal-footer">
+                <button class="hb-btn hb-btn-secondary" id="btn-cancel-action">Cancel</button>
+                <button class="hb-btn hb-btn-primary" id="btn-save-action">
+                  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline>
+                  </svg>
+                  Save Action
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </html>
+    </panel>
+  </row>
+</dashboard>

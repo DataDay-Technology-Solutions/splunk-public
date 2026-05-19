@@ -1,0 +1,7 @@
+<nav search_view="search" color="#FD1875">
+  <view name="monitor" default="true" />
+  <view name="audit" />
+  <view name="settings" />
+  <divider />
+  <a href="/app/SA-Data-Heartbeat/search">Search</a>
+</nav>

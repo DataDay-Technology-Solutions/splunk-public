@@ -1,0 +1,254 @@
+<dashboard version="1.1" theme="dark" stylesheet="css/heartbeat-v2.css">
+  <label>Audit History</label>
+  <description>Complete audit trail of all Data Heartbeat actions</description>
+
+  <!-- Main Audit Log with Inline Filters -->
+  <row>
+    <panel>
+      <title>Audit History Log</title>
+      <input type="dropdown" token="filter_action" searchWhenChanged="true">
+        <label>Action</label>
+        <choice value="*">All Actions</choice>
+        <choice value="added">Source Added</choice>
+        <choice value="removed">Source Removed</choice>
+        <choice value="threshold_changed">Threshold Changed</choice>
+        <choice value="importance_changed">Importance Changed</choice>
+        <choice value="detection_run">Detection Run</choice>
+        <choice value="discovery_run">Discovery Run</choice>
+        <default>*</default>
+      </input>
+      <input type="dropdown" token="filter_user" searchWhenChanged="true">
+        <label>Performed By</label>
+        <choice value="*">All Users</choice>
+        <search>
+          <query>| inputlookup heartbeat_audit_log | stats count by performed_by | fields performed_by</query>
+        </search>
+        <fieldForLabel>performed_by</fieldForLabel>
+        <fieldForValue>performed_by</fieldForValue>
+        <default>*</default>
+      </input>
+      <input type="dropdown" token="filter_sourcetype" searchWhenChanged="true">
+        <label>Sourcetype</label>
+        <choice value="*">All Sourcetypes</choice>
+        <search>
+          <query>| inputlookup heartbeat_audit_log | where sourcetype!="_all_" | stats count by sourcetype | fields sourcetype</query>
+        </search>
+        <fieldForLabel>sourcetype</fieldForLabel>
+        <fieldForValue>sourcetype</fieldForValue>
+        <default>*</default>
+      </input>
+      <input type="time" token="time_filter" searchWhenChanged="true">
+        <label>Time Range</label>
+        <default>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <table id="audit_log_table">
+        <search>
+          <query>| inputlookup heartbeat_audit_log
+| search action=$filter_action$ performed_by=$filter_user$ sourcetype=$filter_sourcetype$
+| eval ts_epoch = if(isnum(timestamp), timestamp, 0)
+| where ts_epoch &gt;= relative_time(now(), "$time_filter.earliest$") OR "$time_filter.earliest$"=""
+| sort - ts_epoch
+| head 1000
+| eval time = strftime(ts_epoch, "%Y-%m-%d %H:%M:%S")
+| eval action_display = case(
+    action="added", "Source Added",
+    action="removed", "Source Removed",
+    action="threshold_changed", "Threshold Changed",
+    action="importance_changed", "Importance Changed",
+    action="detection_run", "Detection Run",
+    action="discovery_run", "Discovery Run",
+    action="status_changed", "Status Changed",
+    1=1, action)
+| eval change_info = case(
+    previous_value!="" AND new_value!="", previous_value." → ".new_value,
+    new_value!="", new_value,
+    previous_value!="", previous_value." (cleared)",
+    1=1, "—")
+| table time, action_display, sourcetype, change_info, performed_by, details
+| rename time as "Timestamp", action_display as "Action", sourcetype as "Sourcetype", change_info as "Change", performed_by as "Performed By", details as "Details"</query>
+          <earliest>$time_filter.earliest$</earliest>
+          <latest>$time_filter.latest$</latest>
+          <refresh>1m</refresh>
+        </search>
+        <option name="count">25</option>
+        <option name="drilldown">none</option>
+        <option name="rowNumbers">true</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Action">
+          <colorPalette type="map">{"Source Added":#53A051,"Source Removed":#DC4E41,"Threshold Changed":#006D9C,"Importance Changed":#F8BE34,"Detection Run":#9E72C5,"Discovery Run":#65A637,"Status Changed":#00D4FF}</colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+
+  <!-- Summary Metrics Row -->
+  <row>
+    <panel>
+      <title>Total Actions (30 Days)</title>
+      <single>
+        <search>
+          <query>| inputlookup heartbeat_audit_log
+| where timestamp > relative_time(now(), "-30d")
+| stats count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0x006d9c"]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Sources Added</title>
+      <single>
+        <search>
+          <query>| inputlookup heartbeat_audit_log
+| where timestamp > relative_time(now(), "-30d")
+| search action="added"
+| stats count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0x65a637"]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Sources Removed</title>
+      <single>
+        <search>
+          <query>| inputlookup heartbeat_audit_log
+| where timestamp > relative_time(now(), "-30d")
+| search action="removed"
+| stats count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0xdc4e41"]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Threshold Changes</title>
+      <single>
+        <search>
+          <query>| inputlookup heartbeat_audit_log
+| where timestamp > relative_time(now(), "-30d")
+| search action="threshold_changed"
+| stats count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0x006d9c"]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Importance Changes</title>
+      <single>
+        <search>
+          <query>| inputlookup heartbeat_audit_log
+| where timestamp > relative_time(now(), "-30d")
+| search action="importance_changed"
+| stats count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0xf8be34"]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+
+  <!-- Activity Timeline Chart -->
+  <row>
+    <panel>
+      <title>Activity Over Time</title>
+      <chart>
+        <search>
+          <query>| inputlookup heartbeat_audit_log
+| search action=$filter_action$ performed_by=$filter_user$ sourcetype=$filter_sourcetype$
+| eval date = strftime(timestamp, "%Y-%m-%d")
+| stats count by date, action
+| sort date</query>
+          <earliest>$time_filter.earliest$</earliest>
+          <latest>$time_filter.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Date</option>
+        <option name="charting.axisTitleY.text">Actions</option>
+        <option name="height">250</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Actions by Type</title>
+      <chart>
+        <search>
+          <query>| inputlookup heartbeat_audit_log
+| search action=$filter_action$ performed_by=$filter_user$ sourcetype=$filter_sourcetype$
+| stats count by action
+| sort - count</query>
+          <earliest>$time_filter.earliest$</earliest>
+          <latest>$time_filter.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="height">250</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- Activity by User and Sourcetypes -->
+  <row>
+    <panel>
+      <title>Top Users</title>
+      <chart>
+        <search>
+          <query>| inputlookup heartbeat_audit_log
+| search action=$filter_action$ performed_by=$filter_user$ sourcetype=$filter_sourcetype$
+| stats count by performed_by
+| sort - count
+| head 10</query>
+          <earliest>$time_filter.earliest$</earliest>
+          <latest>$time_filter.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">250</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Most Modified Sourcetypes</title>
+      <chart>
+        <search>
+          <query>| inputlookup heartbeat_audit_log
+| where sourcetype!="_all_"
+| search action=$filter_action$ performed_by=$filter_user$ sourcetype=$filter_sourcetype$
+| stats count by sourcetype
+| sort - count
+| head 10</query>
+          <earliest>$time_filter.earliest$</earliest>
+          <latest>$time_filter.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">250</option>
+      </chart>
+    </panel>
+  </row>
+
+</dashboard>

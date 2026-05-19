@@ -1,0 +1,402 @@
+<dashboard version="1.1" theme="dark" script="js/utils-v4.js,js/settings-v55.js" stylesheet="css/heartbeat-v2.css">
+  <label>Settings</label>
+  <description>Configure Data Heartbeat detection settings</description>
+
+  <row>
+    <panel>
+      <html>
+        <div class="heartbeat-app">
+          <!-- Header -->
+          <div class="heartbeat-header">
+            <h1 class="heartbeat-title">
+              <span class="pulse-icon">
+                <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FD1875" stroke-width="2">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+              </span>
+              Settings
+            </h1>
+            <p class="heartbeat-subtitle">Configure detection frequency and default thresholds</p>
+          </div>
+
+          <!-- Save model explainer — auto-save vs per-action Save -->
+          <div class="hb-info-banner" role="note">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <div>
+              <strong>How saving works.</strong> Toggles and dropdowns save automatically the moment you change them. Alert action config fields (recipients, webhook URLs) need the <strong>Save</strong> button inside each action — those don't auto-save while you're typing. The page will warn you if you try to leave with unsaved changes.
+            </div>
+          </div>
+
+          <!-- Main Content -->
+          <div class="heartbeat-content">
+
+            <!-- Detection Settings -->
+            <div class="settings-section">
+              <div class="settings-section-header">
+                <h3 class="settings-section-title">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  Detection Settings
+                </h3>
+              </div>
+              <div class="settings-section-body">
+
+                <div class="settings-row">
+                  <div class="settings-row-label">
+                    <h4>Enable Detection</h4>
+                    <p>Schedules <strong>Data Heartbeat - Source Type Monitor</strong> to detect data gaps. Alerts and Auto Discovery have separate toggles below.</p>
+                  </div>
+                  <div class="settings-row-control">
+                    <label class="hb-toggle">
+                      <input type="checkbox" id="setting-enable-detection" />
+                      <span class="hb-toggle-track">
+                        <span class="hb-toggle-thumb"></span>
+                      </span>
+                      <span class="hb-toggle-label" id="detection-status-label">Disabled</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="settings-row">
+                  <div class="settings-row-label">
+                    <h4>Enable Alerts</h4>
+                    <p>Schedules <strong>Data Heartbeat Alert - Flagged Sources</strong>. Configure recipients via Splunk's alert action settings.</p>
+                  </div>
+                  <div class="settings-row-control">
+                    <label class="hb-toggle">
+                      <input type="checkbox" id="setting-enable-alert" />
+                      <span class="hb-toggle-track">
+                        <span class="hb-toggle-thumb"></span>
+                      </span>
+                      <span class="hb-toggle-label" id="alert-status-label">Disabled</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="settings-row">
+                  <div class="settings-row-label">
+                    <h4>Enable Auto Discovery</h4>
+                    <p>Schedules <strong>Data Heartbeat - Auto Discovery</strong> to suggest new monitored sources from your environment.</p>
+                  </div>
+                  <div class="settings-row-control">
+                    <label class="hb-toggle">
+                      <input type="checkbox" id="setting-enable-discovery" />
+                      <span class="hb-toggle-track">
+                        <span class="hb-toggle-thumb"></span>
+                      </span>
+                      <span class="hb-toggle-label" id="discovery-status-label">Disabled</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="settings-row">
+                  <div class="settings-row-label">
+                    <h4>Detection Frequency</h4>
+                    <p>How often the detection search runs (in minutes)</p>
+                  </div>
+                  <div class="settings-row-control">
+                    <select class="hb-form-select" id="setting-detection-frequency" style="width: 120px;">
+                      <option value="1">Every 1 min</option>
+                      <option value="5" selected="selected">Every 5 min</option>
+                      <option value="10">Every 10 min</option>
+                      <option value="15">Every 15 min</option>
+                      <option value="30">Every 30 min</option>
+                      <option value="60">Every 60 min</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="settings-row">
+                  <div class="settings-row-label">
+                    <h4>Default Threshold</h4>
+                    <p>Default threshold for new sourcetypes (in minutes)</p>
+                  </div>
+                  <div class="settings-row-control">
+                    <input type="number" class="hb-form-input" id="setting-default-threshold" value="60" min="1" max="9999" style="width: 100px;" />
+                    <span class="threshold-unit">min</span>
+                  </div>
+                </div>
+
+                <div class="settings-section-footer">
+                  <a href="/manager/SA-Data-Heartbeat/saved/searches?app=SA-Data-Heartbeat&amp;owner=-&amp;ns=SA-Data-Heartbeat&amp;pwnr=nobody" target="_blank" rel="noopener" class="hb-text-link">
+                    Manage all saved searches in Splunk Manager →
+                  </a>
+                </div>
+
+              </div>
+            </div>
+
+
+            <!-- Alert Actions Configuration -->
+            <div class="settings-section">
+              <div class="settings-section-header">
+                <h3 class="settings-section-title">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path>
+                  </svg>
+                  Alert Actions
+                </h3>
+                <span class="settings-section-badge" id="configured-actions-count">0 configured</span>
+              </div>
+              <div class="settings-section-body">
+                <p class="settings-help-text">Configure alert actions to enable them on the monitoring page. Unconfigured actions cannot be selected.</p>
+
+                <div class="alert-actions-accordion" id="alert-actions-list">
+                  <!-- Email -->
+                  <div class="action-accordion-item" data-action="email">
+                    <div class="action-accordion-header">
+                      <div class="action-header-left">
+                        <span class="action-icon email">✉</span>
+                        <span class="action-name">Email</span>
+                        <span class="action-status-badge" id="status-email">Not Configured</span>
+                      </div>
+                      <div class="action-header-right">
+                        <label class="hb-toggle hb-toggle-sm">
+                          <input type="checkbox" class="action-enabled-toggle" data-action="email" />
+                          <span class="hb-toggle-track"><span class="hb-toggle-thumb"></span></span>
+                        </label>
+                        <span class="accordion-chevron">▼</span>
+                      </div>
+                    </div>
+                    <div class="action-accordion-body">
+                      <div class="action-config-field">
+                        <label>Recipients (comma-separated)</label>
+                        <input type="text" class="hb-form-input action-config-input" data-action="email" data-field="recipients" placeholder="ops@company.com, alerts@company.com" />
+                      </div>
+                      <div class="action-config-field">
+                        <label>Subject Prefix</label>
+                        <input type="text" class="hb-form-input action-config-input" data-action="email" data-field="subject" placeholder="[Data Heartbeat Alert]" />
+                      
+                      <div class="action-save-row">
+                        <button class="hb-btn hb-btn-primary hb-btn-sm btn-save-action">Save</button><button type="button" class="hb-btn hb-btn-sm btn-test-action" title="Send a synthetic test alert to verify the action works">Send Test Alert</button>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+
+                  <!-- Slack -->
+                  <div class="action-accordion-item" data-action="slack">
+                    <div class="action-accordion-header">
+                      <div class="action-header-left">
+                        <span class="action-icon slack">#</span>
+                        <span class="action-name">Slack</span>
+                        <span class="action-status-badge" id="status-slack">Not Configured</span>
+                      </div>
+                      <div class="action-header-right">
+                        <label class="hb-toggle hb-toggle-sm">
+                          <input type="checkbox" class="action-enabled-toggle" data-action="slack" />
+                          <span class="hb-toggle-track"><span class="hb-toggle-thumb"></span></span>
+                        </label>
+                        <span class="accordion-chevron">▼</span>
+                      </div>
+                    </div>
+                    <div class="action-accordion-body">
+                      <div class="action-config-field">
+                        <label>Webhook URL</label>
+                        <input type="text" class="hb-form-input action-config-input" data-action="slack" data-field="webhook_url" placeholder="https://hooks.slack.com/services/..." />
+                      </div>
+                      <div class="action-config-field">
+                        <label>Channel</label>
+                        <input type="text" class="hb-form-input action-config-input" data-action="slack" data-field="channel" placeholder="#alerts" />
+                      
+                      <div class="action-save-row">
+                        <button class="hb-btn hb-btn-primary hb-btn-sm btn-save-action">Save</button><button type="button" class="hb-btn hb-btn-sm btn-test-action" title="Send a synthetic test alert to verify the action works">Send Test Alert</button>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+
+                  <!-- PagerDuty -->
+                  <div class="action-accordion-item" data-action="pagerduty">
+                    <div class="action-accordion-header">
+                      <div class="action-header-left">
+                        <span class="action-icon pagerduty">P</span>
+                        <span class="action-name">PagerDuty</span>
+                        <span class="action-status-badge" id="status-pagerduty">Not Configured</span>
+                      </div>
+                      <div class="action-header-right">
+                        <label class="hb-toggle hb-toggle-sm">
+                          <input type="checkbox" class="action-enabled-toggle" data-action="pagerduty" />
+                          <span class="hb-toggle-track"><span class="hb-toggle-thumb"></span></span>
+                        </label>
+                        <span class="accordion-chevron">▼</span>
+                      </div>
+                    </div>
+                    <div class="action-accordion-body">
+                      <div class="action-config-field">
+                        <label>Integration Key (Routing Key)</label>
+                        <input type="text" class="hb-form-input action-config-input" data-action="pagerduty" data-field="integration_key" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+                      
+                      <div class="action-save-row">
+                        <button class="hb-btn hb-btn-primary hb-btn-sm btn-save-action">Save</button><button type="button" class="hb-btn hb-btn-sm btn-test-action" title="Send a synthetic test alert to verify the action works">Send Test Alert</button>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+
+                  <!-- Microsoft Teams -->
+                  <div class="action-accordion-item" data-action="teams">
+                    <div class="action-accordion-header">
+                      <div class="action-header-left">
+                        <span class="action-icon teams">T</span>
+                        <span class="action-name">Microsoft Teams</span>
+                        <span class="action-status-badge" id="status-teams">Not Configured</span>
+                      </div>
+                      <div class="action-header-right">
+                        <label class="hb-toggle hb-toggle-sm">
+                          <input type="checkbox" class="action-enabled-toggle" data-action="teams" />
+                          <span class="hb-toggle-track"><span class="hb-toggle-thumb"></span></span>
+                        </label>
+                        <span class="accordion-chevron">▼</span>
+                      </div>
+                    </div>
+                    <div class="action-accordion-body">
+                      <div class="action-config-field">
+                        <label>Webhook URL</label>
+                        <input type="text" class="hb-form-input action-config-input" data-action="teams" data-field="webhook_url" placeholder="https://outlook.office.com/webhook/..." />
+                      
+                      <div class="action-save-row">
+                        <button class="hb-btn hb-btn-primary hb-btn-sm btn-save-action">Save</button><button type="button" class="hb-btn hb-btn-sm btn-test-action" title="Send a synthetic test alert to verify the action works">Send Test Alert</button>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+
+                  <!-- Webhook -->
+                  <div class="action-accordion-item" data-action="webhook">
+                    <div class="action-accordion-header">
+                      <div class="action-header-left">
+                        <span class="action-icon webhook">↗</span>
+                        <span class="action-name">Webhook</span>
+                        <span class="action-status-badge" id="status-webhook">Not Configured</span>
+                      </div>
+                      <div class="action-header-right">
+                        <label class="hb-toggle hb-toggle-sm">
+                          <input type="checkbox" class="action-enabled-toggle" data-action="webhook" />
+                          <span class="hb-toggle-track"><span class="hb-toggle-thumb"></span></span>
+                        </label>
+                        <span class="accordion-chevron">▼</span>
+                      </div>
+                    </div>
+                    <div class="action-accordion-body">
+                      <div class="action-config-field">
+                        <label>Webhook URL</label>
+                        <input type="text" class="hb-form-input action-config-input" data-action="webhook" data-field="url" placeholder="https://api.example.com/alerts" />
+                      </div>
+                      <div class="action-config-field">
+                        <label>HTTP Method</label>
+                        <select class="hb-form-select action-config-input" data-action="webhook" data-field="method">
+                          <option value="POST">POST</option>
+                          <option value="PUT">PUT</option>
+                        </select>
+                      
+                      <div class="action-save-row">
+                        <button class="hb-btn hb-btn-primary hb-btn-sm btn-save-action">Save</button><button type="button" class="hb-btn hb-btn-sm btn-test-action" title="Send a synthetic test alert to verify the action works">Send Test Alert</button>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+
+                  <!-- ServiceNow -->
+                  <div class="action-accordion-item" data-action="servicenow">
+                    <div class="action-accordion-header">
+                      <div class="action-header-left">
+                        <span class="action-icon servicenow">S</span>
+                        <span class="action-name">ServiceNow</span>
+                        <span class="action-status-badge" id="status-servicenow">Not Configured</span>
+                      </div>
+                      <div class="action-header-right">
+                        <label class="hb-toggle hb-toggle-sm">
+                          <input type="checkbox" class="action-enabled-toggle" data-action="servicenow" />
+                          <span class="hb-toggle-track"><span class="hb-toggle-thumb"></span></span>
+                        </label>
+                        <span class="accordion-chevron">▼</span>
+                      </div>
+                    </div>
+                    <div class="action-accordion-body">
+                      <div class="action-config-field">
+                        <label>Instance URL</label>
+                        <input type="text" class="hb-form-input action-config-input" data-action="servicenow" data-field="instance" placeholder="https://company.service-now.com" />
+                      </div>
+                      <div class="action-config-field">
+                        <label>Username</label>
+                        <input type="text" class="hb-form-input action-config-input" data-action="servicenow" data-field="username" placeholder="integration_user" />
+                      
+                      <div class="action-save-row">
+                        <button class="hb-btn hb-btn-primary hb-btn-sm btn-save-action">Save</button><button type="button" class="hb-btn hb-btn-sm btn-test-action" title="Send a synthetic test alert to verify the action works">Send Test Alert</button>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Current Settings Display -->
+            <div class="settings-section">
+              <div class="settings-section-header">
+                <h3 class="settings-section-title">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                  Current Configuration
+                </h3>
+              </div>
+              <div class="settings-section-body" id="current-settings-display">
+                <div class="hb-loading">
+                  <div class="hb-spinner"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Auto-save: top-level toggles + dropdowns + threshold persist on change.
+               Alert-action config text fields save via the per-action Save button.
+               beforeunload guards against navigating away with unsaved alert-action edits. -->
+          <div class="settings-info-bar">
+            Changes save automatically as you toggle. Alert-action config fields require the action's Save button.
+          </div>
+
+          <!-- Index access modal: shown once on first Settings load, also reachable from Monitor's help button. -->
+          <div class="hb-modal-backdrop" id="index-access-modal" style="display:none">
+            <div class="hb-modal">
+              <div class="hb-modal-header">
+                <h3 class="hb-modal-title">⚠ Index permissions matter</h3>
+                <button class="hb-modal-close">&#x2715;</button>
+              </div>
+              <div class="hb-modal-body">
+                <p>Data Heartbeat watches the <strong>last-event time</strong> for each monitored sourcetype using Splunk's <code>| metadata type=sourcetypes</code> command. That command only returns sourcetypes the <em>running user can read</em>.</p>
+                <p class="hb-modal-callout">
+                  <strong>Required:</strong> the user that runs the Detection saved search needs read access to <code>index=*</code> AND <code>index=_*</code> (internal indexes).
+                </p>
+                <p>If a sourcetype lives in an index the running user can't read, that row will show <span class="hb-help-pill hb-help-pill-pending">Pending</span> forever — Splunk silently omits it from <code>metadata</code> results.</p>
+                <p><strong>Recommended:</strong> create a dedicated <code>heartbeat_service</code> user (or a role) with <code>srchIndexesAllowed = *,_*</code> in authorize.conf, and have the saved searches run as that user.</p>
+                <p class="hb-modal-callout-info">Default install: searches run as <code>nobody</code> in the app context, which inherits the install admin's permissions. If your admin doesn't have <code>_internal</code> access (Splunk Cloud customers often don't), splunkd-itself, audit, and similar internal sourcetypes won't be visible.</p>
+              </div>
+              <div class="hb-modal-footer">
+                <label class="hb-checkbox">
+                  <input type="checkbox" id="index-modal-dontshow" /> Don't show this again
+                </label>
+                <button class="hb-btn hb-btn-primary btn-modal-cancel">Got it</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </html>
+    </panel>
+  </row>
+</dashboard>

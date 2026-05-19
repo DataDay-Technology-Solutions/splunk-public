@@ -1,0 +1,82 @@
+DataDay Tech Software License v1.0
+
+Copyright (c) 2026 DataDay Technology Solutions. All rights reserved.
+
+GRANT: You are granted a non-exclusive, non-transferable, revocable
+license to use this software for internal business purposes only,
+subject to the terms and conditions of this agreement and any
+applicable license tier (Free or Premium) governing your use.
+
+RESTRICTIONS: You may NOT:
+  1. Modify, adapt, reverse engineer, decompile, or disassemble
+     this software, in whole or in part
+  2. Redistribute, sublicense, sell, lease, rent, or transfer
+     this software to any third party
+  3. Remove, alter, or obscure any copyright, trademark, license,
+     or attribution notices contained in this software
+  4. Use this software to create derivative or competing products
+  5. Use this software as part of a managed service, consulting
+     engagement, or offering to third parties without a separate
+     commercial agreement with DataDay Technology Solutions
+  6. Use automated tools, including but not limited to AI systems,
+     large language models (LLMs), code generation tools, or
+     machine learning systems to analyze, extract, replicate,
+     reproduce, or generate code based on this software
+  7. Circumvent, disable, or tamper with any license enforcement,
+     tier gating, or feature restriction mechanisms contained
+     in this software
+  8. Share, publish, or disclose license keys, activation codes,
+     or license files to unauthorized parties
+
+SOURCE CODE VISIBILITY: The visibility of source code within this
+application does not constitute an open-source license. All code,
+algorithms, designs, and creative works remain the exclusive
+intellectual property of DataDay Technology Solutions.
+
+INTELLECTUAL PROPERTY: This software and all associated
+documentation, designs, and materials are protected by copyright
+law, trade secret law, and international treaties. DataDay
+Technology Solutions retains all right, title, and interest in
+and to this software.
+
+FREE TIER: The free tier of this software is provided at no cost
+with limited functionality as described in the application
+documentation. Free tier usage is subject to all terms of this
+license. DataDay Technology Solutions reserves the right to
+modify free tier limits at any time.
+
+PREMIUM TIER: Premium features require a valid license key
+purchased from DataDay Technology Solutions. License keys are
+non-transferable and locked to a single application instance.
+For pricing and purchase, visit https://datadaytech.com
+
+DATA COLLECTION: This software may communicate with DataDay
+Technology Solutions servers for license validation purposes.
+No customer data, search queries, or Splunk content is
+transmitted. Only license key, application version, and
+instance identifier are sent for validation.
+
+TERMINATION: This license terminates immediately upon violation
+of any term. Upon termination, you must cease all use and
+destroy all copies of this software.
+
+DISCLAIMER: THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY
+OF ANY KIND, EXPRESS OR IMPLIED. DATADAY TECHNOLOGY SOLUTIONS
+DISCLAIMS ALL WARRANTIES INCLUDING MERCHANTABILITY, FITNESS FOR
+A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+LIMITATION OF LIABILITY: IN NO EVENT SHALL DATADAY TECHNOLOGY
+SOLUTIONS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, OR
+CONSEQUENTIAL DAMAGES ARISING FROM USE OF THIS SOFTWARE.
+
+DMCA NOTICE: DataDay Technology Solutions will enforce its
+intellectual property rights to the fullest extent of the law,
+including but not limited to filing DMCA takedown notices for
+unauthorized distribution, reproduction, or derivative works
+based on this software.
+
+GOVERNING LAW: This license shall be governed by the laws of
+the United States of America.
+
+Contact: steve@datadaytech.com
+Website: https://datadaytech.com

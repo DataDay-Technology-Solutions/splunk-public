@@ -1,0 +1,11 @@
+timestamp,action_type,user,target,details
+"2025-01-18 10:30:00","add","admin","access_combined","Added source type with threshold 60 minutes"
+"2025-01-18 10:25:00","update","admin","syslog","Changed threshold from 30 to 45 minutes"
+"2025-01-18 10:20:00","status","system","web_access","Status changed from good to flagged"
+"2025-01-18 09:15:00","add","admin","firewall_logs","Added source type via discovery"
+"2025-01-18 09:00:00","update","admin","detection_frequency","Changed from 5 to 10 minutes"
+"2025-01-17 16:45:00","update","admin","access_combined","Changed importance to VIP"
+"2025-01-17 14:30:00","status","system","syslog","Status changed from flagged to good"
+"2025-01-17 12:00:00","add","discovery","pan_traffic","Auto-discovered from scheduled searches"
+"2025-01-17 11:30:00","delete","admin","old_sourcetype","Removed from monitoring"
+"2025-01-17 10:00:00","update","admin","default_threshold","Changed default threshold to 60 minutes"

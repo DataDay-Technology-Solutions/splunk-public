@@ -1,0 +1,3 @@
+setting_name,setting_value,description
+detection_frequency,5,Detection search frequency in minutes (1-60)
+default_threshold,60,Default threshold for new source types in minutes

@@ -1,0 +1,80 @@
+category,match_type,sourcetype,importance,threshold,notes
+security,exact,crowdstrike:events,critical,30,CrowdStrike EDR events
+security,exact,crowdstrike:falcon,critical,30,CrowdStrike Falcon events
+security,exact,carbon_black:defense,critical,30,Carbon Black Defense
+security,exact,carbonblack:defense:json,critical,30,Carbon Black Defense JSON
+security,exact,sentinelone:threats,critical,30,SentinelOne threat events
+security,exact,ms:defender:advanced,critical,30,Microsoft Defender ATP
+security,exact,symantec:ep:security,critical,45,Symantec Endpoint Protection
+security,exact,WinEventLog:Security,critical,30,Windows Security event log
+security,exact,xmlwineventlog:security,critical,30,Windows Security XML format
+security,exact,WinEventLog:Microsoft-Windows-Sysmon/Operational,critical,30,Sysmon operational logs
+identity,exact,okta:log,critical,30,Okta SSO authentication logs
+identity,exact,azure:aad:signin,critical,45,Azure AD sign-in logs
+identity,exact,azure:aad:audit,critical,60,Azure AD audit logs
+identity,exact,duo:authentication,critical,30,Duo MFA authentication
+identity,exact,ping:authentication,critical,45,Ping Identity authentication
+identity,exact,onelogin:events,critical,30,OneLogin events
+network,exact,pan:traffic,critical,30,Palo Alto firewall traffic
+network,exact,pan:threat,critical,15,Palo Alto threat logs
+network,exact,cisco:asa,critical,30,Cisco ASA firewall
+network,exact,cisco:firepower,critical,30,Cisco Firepower IDS/IPS
+network,exact,fortinet:fortigate,critical,30,Fortinet FortiGate firewall
+network,exact,checkpoint:firewall,critical,30,Check Point firewall
+network,exact,juniper:srx,high,45,Juniper SRX firewall
+network,exact,zscaler:nss,critical,30,Zscaler NSS logs
+network,exact,suricata,high,30,Suricata IDS/IPS
+network,exact,zeek:conn,high,60,Zeek connection logs
+cloud,exact,aws:cloudtrail,critical,60,AWS CloudTrail API logs
+cloud,exact,aws:guardduty,critical,30,AWS GuardDuty findings
+cloud,exact,aws:securityhub,critical,45,AWS Security Hub
+cloud,exact,gcp:pubsub:audit,critical,60,GCP Audit logs
+cloud,exact,google:gcp:audit,critical,60,Google Cloud audit
+cloud,exact,azure:activity,critical,60,Azure Activity logs
+cloud,exact,azure:security,critical,45,Azure Security Center
+cloud,exact,o365:management:activity,high,60,Office 365 management activity
+infrastructure,exact,linux_secure,high,60,Linux secure/auth logs
+infrastructure,exact,linux_audit,high,60,Linux audit logs
+infrastructure,exact,syslog,high,60,Syslog messages
+infrastructure,exact,vmware:vcenter,medium,120,VMware vCenter logs
+infrastructure,exact,wineventlog:system,medium,90,Windows System event log
+infrastructure,exact,WinEventLog:System,medium,90,Windows System event log
+infrastructure,exact,access_combined,medium,60,Web access logs
+infrastructure,exact,iis,medium,60,IIS web server logs
+infrastructure,exact,apache:access,medium,60,Apache access logs
+infrastructure,exact,nginx:access,medium,60,Nginx access logs
+splunk,exact,splunkd,medium,120,Splunk daemon logs
+splunk,exact,splunk_web_access,medium,120,Splunk web access
+security,regex,^crowdstrike:,critical,30,CrowdStrike logs (auto-classified)
+security,regex,^carbon_?black:,critical,30,Carbon Black logs (auto-classified)
+security,regex,^sentinelone:,critical,30,SentinelOne logs (auto-classified)
+security,regex,^defender:,critical,30,Microsoft Defender logs (auto-classified)
+security,regex,^cylance:,critical,30,Cylance logs (auto-classified)
+security,regex,^sysmon,critical,30,Sysmon logs (auto-classified)
+security,regex,^(win|xml)?eventlog:security,critical,30,Windows Security logs (auto-classified)
+security,regex,^(win|xml)?eventlog:,high,60,Windows Event logs (auto-classified)
+network,regex,^pan:,critical,30,Palo Alto Networks logs (auto-classified)
+network,regex,^cisco:(asa|firepower|ftd),critical,30,Cisco firewall logs (auto-classified)
+network,regex,^fortinet:,critical,45,Fortinet logs (auto-classified)
+network,regex,^checkpoint:,critical,45,Check Point logs (auto-classified)
+network,regex,^juniper:,high,60,Juniper logs (auto-classified)
+network,regex,^zeek:,high,60,Zeek/Bro network logs (auto-classified)
+network,regex,^suricata,high,30,Suricata IDS logs (auto-classified)
+network,regex,^snort,high,30,Snort IDS logs (auto-classified)
+identity,regex,^okta:,critical,30,Okta logs (auto-classified)
+identity,regex,^duo:,critical,30,Duo Security logs (auto-classified)
+identity,regex,^ping:,high,45,Ping Identity logs (auto-classified)
+identity,regex,^onelogin:,critical,30,OneLogin logs (auto-classified)
+cloud,regex,^aws:(cloudtrail|guardduty|security),critical,60,AWS security logs (auto-classified)
+cloud,regex,^azure:(aad|security|activity),critical,60,Azure security logs (auto-classified)
+cloud,regex,^gcp:,critical,60,Google Cloud logs (auto-classified)
+cloud,regex,^google:gcp,critical,60,Google Cloud logs (auto-classified)
+cloud,regex,^aws:cloudwatch,high,120,AWS CloudWatch logs (auto-classified)
+cloud,regex,^aws:,medium,120,AWS logs (auto-classified)
+cloud,regex,^o365:,high,60,Office 365 logs (auto-classified)
+cloud,regex,^ms:(o365|defender|aad),high,60,Microsoft 365 logs (auto-classified)
+infrastructure,regex,^qualys:,high,120,Qualys logs (auto-classified)
+infrastructure,regex,^tenable:,high,120,Tenable logs (auto-classified)
+infrastructure,regex,^nessus:,high,120,Nessus logs (auto-classified)
+infrastructure,regex,^rapid7:,high,120,Rapid7 logs (auto-classified)
+infrastructure,regex,^linux[_:]?(secure|audit),high,60,Linux security logs (auto-classified)

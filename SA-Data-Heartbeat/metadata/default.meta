@@ -1,0 +1,21 @@
+# Application-level permissions
+[]
+access = read : [ * ], write : [ admin, sc_admin ]
+
+[views]
+access = read : [ * ], write : [ admin, sc_admin ]
+
+[nav]
+access = read : [ * ], write : [ admin, sc_admin ]
+
+[lookups]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
+
+[transforms]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
+
+[savedsearches]
+access = read : [ * ], write : [ admin, sc_admin ]
+export = system
