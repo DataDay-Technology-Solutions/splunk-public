@@ -104,55 +104,59 @@ def _do_enable_all(session_key, enabled):
     return all_ok, results
 
 
-def _do_test_alert(session_key, action_type, target_config):
-    """Invoke the dispatcher's slack/teams/webhook path with a synthetic row.
-    We don't go through the saved-search → action.heartbeat_dispatch chain
-    because we want immediate feedback; instead we shell out to the dispatcher
-    script directly with a minimal payload."""
-    import subprocess
-    import tempfile
-    import gzip
-    import csv
-    import shutil
-    # Write a one-row results CSV that the dispatcher can read. Use a
-    # try/finally so the tmp dir is always cleaned up — each test-alert
-    # click previously leaked a directory on disk.
-    tmpdir = tempfile.mkdtemp(prefix="hb_test_")
+def _do_test_alert(session_key, action_type, target_config, splunkd_uri=""):
+    """Invoke the dispatcher's slack/teams/webhook/email path with a synthetic
+    row, in-process — no subprocess.
+
+    Splunk Cloud forbids modular code from spawning child processes, so the
+    previous `subprocess.run(splunk cmd python3 heartbeat_dispatch.py)` would
+    have failed AppInspect's cloud_compatible tag and been rejected at
+    Splunkbase submission. We import the dispatcher's per-action functions
+    directly and call them inline. Same code path; no fork/exec.
+    """
+    # bin/ is already on sys.path inside a persistent REST handler — splunkd
+    # adds it when loading the handler script. But add it defensively for
+    # local test invocations.
+    bin_dir = os.path.dirname(os.path.abspath(__file__))
+    if bin_dir not in sys.path:
+        sys.path.insert(0, bin_dir)
     try:
-        csv_path = os.path.join(tmpdir, "results.csv")
-        with open(csv_path, "w", newline="") as fh:
-            w = csv.writer(fh)
-            w.writerow(["sourcetype", "threshold_minutes", "minutes_since_seen",
-                        "status", "importance", "alert_action", "alert_action_config"])
-            w.writerow(["heartbeat:test", "60", "0", "test", "high",
-                        action_type, target_config])
-        gz_path = csv_path + ".gz"
-        with open(csv_path, "rb") as src, gzip.open(gz_path, "wb") as dst:
-            dst.writelines(src)
-        payload = json.dumps({
+        import heartbeat_dispatch as hd
+    except ImportError as e:
+        log.error("could not import heartbeat_dispatch: %s", e)
+        return False, {"error": "dispatcher import failed: {}".format(e)}
+
+    payload = hd.build_payload(
+        {
+            "sourcetype": "heartbeat:test",
+            "threshold_minutes": 60,
+            "minutes_since_seen": 0,
+            "status": "test",
+            "importance": "high",
+        },
+        {
             "search_name": "Data Heartbeat - Test Alert",
-            "trigger_time_rendered": "now",
-            "results_link": "",
-            "session_key": session_key,
-            "results_file": gz_path,
-        })
-        splunk_home = os.environ.get("SPLUNK_HOME", "/opt/splunk")
-        cmd = [
-            os.path.join(splunk_home, "bin", "splunk"), "cmd", "python3",
-            os.path.join(splunk_home, "etc", "apps", APP_NAME, "bin", "heartbeat_dispatch.py"),
-            "--execute",
-        ]
-        try:
-            p = subprocess.run(cmd, input=payload.encode("utf-8"),
-                               capture_output=True, timeout=15)
-            return p.returncode == 0, {"stdout": p.stdout.decode("utf-8", "ignore")[:500],
-                                        "stderr": p.stderr.decode("utf-8", "ignore")[:500]}
-        except subprocess.TimeoutExpired:
-            return False, {"error": "timeout"}
-        except OSError as e:
-            return False, {"error": str(e)}
-    finally:
-        shutil.rmtree(tmpdir, ignore_errors=True)
+            "fired_at": "now",
+            "splunk_url": "",
+        },
+    )
+    action_type = (action_type or "").strip().lower()
+    try:
+        if action_type == "slack":
+            ok = hd.dispatch_slack(payload, target_config)
+        elif action_type == "teams":
+            ok = hd.dispatch_teams(payload, target_config)
+        elif action_type == "webhook":
+            ok = hd.dispatch_webhook(payload, target_config)
+        elif action_type == "email":
+            ok = hd.dispatch_email(payload, target_config, session_key,
+                                   splunkd_uri=splunkd_uri)
+        else:
+            return False, {"error": "unknown action_type: {}".format(action_type)}
+    except Exception as e:
+        log.error("test_alert exception (%s): %s", action_type, e)
+        return False, {"error": str(e)}
+    return bool(ok), {"sent": bool(ok), "action": action_type}
 
 
 class HeartbeatAdminHandler(application.PersistentServerConnectionApplication):
@@ -243,7 +247,16 @@ class HeartbeatAdminHandler(application.PersistentServerConnectionApplication):
             target_config = post.get("target", "")
             if not action_type or not target_config:
                 return self._reply(400, {"error": "missing action_type or target"})
-            ok, detail = _do_test_alert(session_key, action_type, target_config)
+            # Splunk persist handlers receive the splunkd URI in the request
+            # context — pass it through so the email path uses the correct
+            # loopback rather than guessing at localhost:8089.
+            splunkd_uri = (
+                req.get("server_uri")
+                or req.get("splunk_uri")
+                or os.environ.get("SPLUNKD_URI", "")
+            )
+            ok, detail = _do_test_alert(session_key, action_type, target_config,
+                                        splunkd_uri=splunkd_uri)
             return self._reply(200 if ok else 500, {"ok": ok, "detail": detail})
 
         return self._reply(400, {"error": "unknown action"})

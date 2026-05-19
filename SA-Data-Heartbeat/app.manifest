@@ -5,7 +5,7 @@
     "id": {
       "group": null,
       "name": "SA-Data-Heartbeat",
-      "version": "1.2.3"
+      "version": "1.2.4"
     },
     "author": [
       {
@@ -14,7 +14,7 @@
         "company": "DataDay Technology Solutions"
       }
     ],
-    "releaseDate": "2026-05-18",
+    "releaseDate": "2026-05-19",
     "description": "Monitor source types for data gaps. Detects when source types stop logging and flags them based on configurable thresholds. Your data's pulse - always monitored.",
     "classification": {
       "intendedAudience": "IT",
@@ -36,7 +36,7 @@
     },
     "releaseNotes": {
       "name": "Release Notes",
-      "text": "1.2.3: Alert dispatcher hardening. Fixes self-signed-cert failure on localhost splunkd email path; validates webhook URLs (rejects non-http(s) targets like Slack channel names instead of crashing); guards SPL injection via email recipients/sourcetype; per-row failures now identify the offending sourcetype/action; throttle no longer blocks worker pool during sleep; email path now retries on transient errors; User-Agent auto-syncs with app version. UI: slack target placeholder now correctly suggests a webhook URL.",
+      "text": "1.2.4: Splunk Cloud compatibility pass — runs on Cloud (Victoria + Classic) and on-prem Enterprise. Replaces the test-alert handler's subprocess fork with in-process dispatch (Cloud forbids subprocess); removes passSystemAuth from restmap.conf; redirects Health Metrics writes from `| collect index=_internal` (blocked for nobody on Cloud) to the heartbeat_audit_log lookup; adds Cloud to platformRequirements; adds distsearch.conf so CSV lookups replicate across SHC nodes; removes empty docs/screenshots placeholder. 1.2.3: Alert dispatcher hardening — see CHANGELOG.md for the full 29-bug audit.",
       "uri": null
     }
   },
@@ -46,7 +46,8 @@
   "incompatibleApps": null,
   "platformRequirements": {
     "splunk": {
-      "Enterprise": "*"
+      "Enterprise": "*",
+      "Cloud": "*"
     }
   },
   "targetWorkloads": ["_search_heads"]

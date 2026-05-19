@@ -3,6 +3,22 @@
 All notable changes to SA-Data-Heartbeat are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project follows [Semantic Versioning](https://semver.org/).
 
+## [v1.2.4] - 2026-05-19
+
+Splunk Cloud compatibility pass. The v1.2.3 audit caught 29 functional bugs but missed Cloud-submission blockers because it didn't run AppInspect's `cloud_compatible` tag. This release fixes the remaining issues so the app runs unchanged on Splunk Cloud (Victoria + Classic) and Splunk Enterprise on-prem. AppInspect `cloud + cloud_compatible + packaging_standards + splunk_appinspect + migration_victoria + future` (precert): **0 errors / 0 failures / 2 future_failures (advisory) / 3 informational warnings / 127 success / 117 N/A**.
+
+### Fixed
+- **Cloud-blocker: `subprocess.run` in REST admin handler.** The "Send Test Alert" path in `bin/heartbeat_admin.py` shelled out to `splunk cmd python3 heartbeat_dispatch.py` via `subprocess.run`. Splunk Cloud forbids subprocess from custom apps. Replaced with in-process import of the dispatcher's per-action functions (`dispatch_slack/teams/webhook/email`) — same code path, no fork/exec.
+- **Cloud-blocker: `passSystemAuth = true` in `default/restmap.conf`.** Elevated-privilege handlers are forbidden on Splunk Cloud. Removed. The handler now runs as the authenticated user, which is what the capability gate (`edit_search_scheduler` / `admin_all_objects`) wants anyway.
+- **Cloud-blocker: Health Metrics search wrote to `_internal`.** `| collect index=_internal` is forbidden for the default `nobody` saved-search owner on Splunk Cloud — the metrics search would have silently failed there. Now writes to the `heartbeat_audit_log` lookup with `| outputlookup heartbeat_audit_log append=true`.
+- **Cloud-blocker: `app.manifest` declared only Enterprise platform.** Splunkbase / Cloud submission requires explicit Cloud platform support. Added `"Cloud": "*"` alongside `"Enterprise": "*"` in `platformRequirements.splunk`.
+- **SHC replication: CSV-backed lookups didn't replicate.** KV-store auto-replicates across search head clusters (which Splunk Cloud uses under the hood), but our three CSV lookups (`heartbeat_audit_log.csv`, `heartbeat_alert_actions.csv`, `monitored_sourcetypes_backup.csv`) stayed local to whichever node wrote them. Added `default/distsearch.conf` with a `replicationWhitelist` covering `apps/SA-Data-Heartbeat/lookups/*.csv`.
+- **Removed `python.required = 3.13` from `default/restmap.conf` and `default/alert_actions.conf`.** Pinning Python 3.13 broke compatibility with Splunk versions shipping older Python (Cloud Victoria currently ships 3.9, on-prem Enterprise 9.x ships 3.9). Falling back to `python.version = python3` only — this raises 2 informational `future_failure` items from AppInspect about Splunk 10.2's deprecation of `python.version`, but those are advisory and don't block submission today.
+- **Removed empty `docs/screenshots/` placeholder.** Was only a README.md inside the otherwise-empty directory.
+
+### Changed
+- `app.manifest` `releaseNotes` updated to describe Cloud-compat scope.
+
 ## [v1.2.3] - 2026-05-18
 
 This release is a hardening pass driven by a multi-pass bug audit. Every fix in this changelog corresponds to a verified, reproducible defect — no speculative changes.
